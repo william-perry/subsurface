@@ -41,6 +41,7 @@ before_install:
 
 
 script:
+    - export PATH=$PWD/Qt/5.9.1/gcc_64/bin:$PATH # Make sure correct qmake is found on the $PATH for linuxdeployqt
     - export CMAKE_PREFIX_PATH=$PWD/Qt/5.9.1/gcc_64/lib/cmake ;
       cd .. ;
       bash -e ./subsurface/scripts/build.sh -both -no-bt ;
@@ -51,8 +52,9 @@ script:
     - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
     - chmod a+x linuxdeployqt*.AppImage
     - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
-    - ./linuxdeployqt*.AppImage ./install-root/usr/share/applications/*.desktop -bundle-non-qt-libs
-    - ./linuxdeployqt*.AppImage ./install-root/usr/share/applications/*.desktop -appimage
+    - ./linuxdeployqt*.AppImage --appimage-extract
+    - ./squashfs-root/AppRun ./install-root/usr/share/applications/*.desktop -bundle-non-qt-libs
+    - ./squashfs-root/AppRun ./install-root/usr/share/applications/*.desktop -appimage
 
 after_success:
     - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq

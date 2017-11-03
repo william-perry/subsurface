@@ -53,6 +53,8 @@ script:
     - mkdir -p appdir/usr/share/metainfo ; cp subsurface/appdata/subsurface.appdata.xml appdir/usr/share/metainfo/
     - mkdir -p appdir/usr/share/applications ; cp subsurface/subsurface.desktop appdir/usr/share/applications/
     - mkdir -p appdir/usr/share/icons/hicolor/256x256/apps ; cp subsurface/icons/subsurface-icon.png appdir/usr/share/icons/hicolor/256x256/apps/
+    - mv appdir/home/travis/build/probonopd/subsurface/Qt/5.9.1/gcc_64/plugins appdir/usr/
+    - rm -rf appdir/usr/home/ appdir/usr/include/
     - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
     - chmod a+x linuxdeployqt*.AppImage
     - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH

@@ -48,13 +48,16 @@ script:
       bash -e ./subsurface/scripts/build.sh -both
     - env CTEST_OUTPUT_ON_FAILURE=1 make -C subsurface/build check
     - # env CTEST_OUTPUT_ON_FAILURE=1 make -C subsurface/build-mobile check
-    - ls -lh
+    - find ./install-root/
+    - mkdir -p appdir/ ; cp -r ./install-root ./appdir/usr
+    - mkdir -p appdir/usr/share/metainfo ; cp subsurface/appdata/subsurface.appdata.xml appdir/usr/share/metainfo/
+    - mkdir -p appdir/usr/share/applications ; cp  subsurface/subsurface.desktop appdir/usr/share/applications/
     - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
     - chmod a+x linuxdeployqt*.AppImage
     - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
     - ./linuxdeployqt*.AppImage --appimage-extract
-    - ./squashfs-root/AppRun ./install-root/usr/share/applications/*.desktop -bundle-non-qt-libs
-    - ./squashfs-root/AppRun ./install-root/usr/share/applications/*.desktop -appimage
+    - ./squashfs-root/AppRun ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
+    - ./squashfs-root/AppRun ./appdir/usr/share/applications/*.desktop -appimage
 
 after_success:
     - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq

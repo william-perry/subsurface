@@ -49,6 +49,8 @@ script:
     - env CTEST_OUTPUT_ON_FAILURE=1 make -C subsurface/build check
     - # env CTEST_OUTPUT_ON_FAILURE=1 make -C subsurface/build-mobile check
     - find ./install-root/
+    - find . -type f -name subsurface
+    - mkdir -p appdir/usr/bin ; cp $(find . -type f -name subsurface) appdir/usr/bin/
     - mkdir -p appdir/ ; cp -r ./install-root ./appdir/usr
     - mkdir -p appdir/usr/share/metainfo ; cp subsurface/appdata/subsurface.appdata.xml appdir/usr/share/metainfo/
     - mkdir -p appdir/usr/share/applications ; cp subsurface/subsurface.desktop appdir/usr/share/applications/

@@ -65,7 +65,9 @@ script:
     - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
     - chmod a+x linuxdeployqt*.AppImage
     - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
-    - ./linuxdeployqt*.AppImage ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs -qmldir=./subsurface/ -verbose=2
-    - ./linuxdeployqt*.AppImage ./appdir/usr/share/applications/*.desktop -appimage -qmldir=./subsurface/ -verbose=2
+    - # FIXME: Workaround for https://github.com/Subsurface-divelog/subsurface/issues/769#issuecomment-341920456
+    - cp ./subsurface/mobile-widgets/{MapWidget,MapWidgetContextMenu,MapWidgetError}.qml ./subsurface/desktop-widgets
+    - ./linuxdeployqt*.AppImage ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs -qmldir=./subsurface/desktop-widgets/ -verbose=2
+    - ./linuxdeployqt*.AppImage ./appdir/usr/share/applications/*.desktop -appimage -qmldir=./subsurface/desktop-widgets/ -verbose=2
     - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
     - curl --upload-file ./Subsurface*.AppImage https://transfer.sh/Subsurface-git.$(cd subsurface/ ; git rev-parse --short HEAD)-x86_64.AppImage

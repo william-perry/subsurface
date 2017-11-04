@@ -63,7 +63,5 @@ script:
     - ./linuxdeployqt*.AppImage --appimage-extract
     - ./squashfs-root/AppRun ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
     - ./squashfs-root/AppRun ./appdir/usr/share/applications/*.desktop -appimage
-
-after_success:
     - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
     - curl --upload-file ./Subsurface*.AppImage https://transfer.sh/Subsurface-git.$(git rev-parse --short HEAD)-x86_64.AppImage

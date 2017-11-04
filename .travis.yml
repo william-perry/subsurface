@@ -2,9 +2,9 @@ language: c++
 sudo: true # for FUSE
 dist: trusty
 
-cache:
-    directories:
-        - Qt
+# cache:
+#     directories:
+#         - Qt
 
 addons:
     apt:

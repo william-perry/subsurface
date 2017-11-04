@@ -27,6 +27,8 @@ addons:
             - libcurl4-openssl-dev
             # Not a subsurface dependency, but a Qt dependency
             - mesa-common-dev
+            # Not a subsurface dependency, but a QtMultimedia/libdeclarative_multimedia.so dependency
+            - libpulse-mainloop-glib0
 
 before_install:
     - if [ ! -e Qt/5.9.1 ] ; then

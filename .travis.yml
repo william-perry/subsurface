@@ -55,7 +55,7 @@ script:
     - mkdir -p appdir/usr/share/metainfo ; cp subsurface/appdata/subsurface.appdata.xml appdir/usr/share/metainfo/
     - mkdir -p appdir/usr/share/applications ; cp subsurface/subsurface.desktop appdir/usr/share/applications/
     - mkdir -p appdir/usr/share/icons/hicolor/256x256/apps ; cp subsurface/icons/subsurface-icon.png appdir/usr/share/icons/hicolor/256x256/apps/
-    - mv appdir/home/travis/build/*/subsurface/Qt/5.9.1/gcc_64/plugins appdir/usr/
+    - mv appdir/usr/home/travis/build/*/subsurface/Qt/5.9.1/gcc_64/plugins appdir/usr/
     - sudo mv appdir/usr/lib/* /usr/local/lib/ # Workaround for https://github.com/probonopd/linuxdeployqt/issues/160
     - export LD_LIBRARY_PATH=/usr/local/lib/ # Workaround for https://github.com/probonopd/linuxdeployqt/issues/160
     - rm -rf appdir/usr/home/ appdir/usr/include/ appdir/usr/share/man/ # No need to ship developer and man files as part of the AppImage

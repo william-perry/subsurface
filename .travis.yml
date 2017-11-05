@@ -59,7 +59,7 @@ script:
     - rm -rf appdir/usr/home/ appdir/usr/include/ appdir/usr/share/man/ # No need to ship developer and man files as part of the AppImage
     - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
     - chmod a+x linuxdeployqt*.AppImage
-    - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+    - unset QTDIR; unset QT_PLUGIN_PATH
     - # FIXME: Workaround for https://github.com/Subsurface-divelog/subsurface/issues/769#issuecomment-341920456
     - mkdir -p ./subsurface/map-widget ; cp ./subsurface/mobile-widgets/qml/{MapWidget,MapWidgetContextMenu,MapWidgetError}.qml ./subsurface/map-widget
     - ./linuxdeployqt*.AppImage ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs -qmldir=./subsurface/map-widget/ -verbose=2

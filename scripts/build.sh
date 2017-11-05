@@ -483,8 +483,5 @@ for (( i=0 ; i < ${#BUILDS[@]} ; i++ )) ; do
 	fi
 
 	LIBRARY_PATH=$INSTALL_ROOT/lib make -j4
-
-	if [ $PLATFORM = Darwin ] ; then
-		LIBRARY_PATH=$INSTALL_ROOT/lib make install
-	fi
+	LIBRARY_PATH=$INSTALL_ROOT/lib make install
 done

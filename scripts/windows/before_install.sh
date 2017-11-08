@@ -27,7 +27,12 @@ cd ${TRAVIS_BUILD_DIR}/..
 ln -s /usr/lib/mxe .
 
 # somehow we aren't finding the Qt configuration (which is outdated - 5.8.0)
-find /usr/lib/mxe/usr/i686-w64-mingw32.shared/qt5/lib
+#find /usr/lib/mxe/usr/i686-w64-mingw32.shared/qt5/lib
+
+# in order to be able to install our additional packages, we need to make
+# the sysroot user writeable - easiest way is to have it just owned by $USER
+
+sudo chown -R $USER /usr/lib/mxe/usr/i686-w64-mingw32.shared
 
 # now set up our other dependencies
 

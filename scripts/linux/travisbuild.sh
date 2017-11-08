@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # this gets executed by Travis when building an AppImage for Linux

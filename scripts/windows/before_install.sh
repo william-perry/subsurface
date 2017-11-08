@@ -15,6 +15,11 @@ sudo apt-get --yes install upx-ucl mxe-i686-w64-mingw32.shared-qt mxe-i686-w64-m
 cd ${TRAVIS_BUILD_DIR}/..
 ln -s /usr/lib/mxe .
 
+# somehow we aren't finding the Qt configuration (which is outdated - 5.8.0)
+find /usr/lib/mxe
+
+exit 1
+
 # now set up our other dependencies
 
 CURRENT_LIBZIP="1.2.0"

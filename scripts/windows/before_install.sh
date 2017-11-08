@@ -60,8 +60,6 @@ fi
 echo "Get libgit2"
 cd ${TRAVIS_BUILD_DIR}/..
 git clone https://github.com/libgit2/libgit2.git
-fi
-fi
 cd libgit2
 if ! git checkout $CURRENT_LIBGIT2 ; then
 	echo "Can't find the right tag in libgit2 - giving up"

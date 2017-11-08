@@ -10,15 +10,24 @@ sudo apt-key adv --keyserver x-hkp://keys.gnupg.net \
 
 sudo apt-get update
 
-sudo apt-get --yes install upx-ucl mxe-i686-w64-mingw32.shared-qt mxe-i686-w64-mingw32.shared-nsis
+sudo apt-get --yes install upx-ucl \
+	mxe-i686-w64-mingw32.shared-qtscript \
+	mxe-i686-w64-mingw32.shared-qtconnectivity \
+	mxe-i686-w64-mingw32.shared-qtlocation \
+	mxe-i686-w64-mingw32.shared-qtsvg \
+	mxe-i686-w64-mingw32.shared-qtdeclarative \
+	mxe-i686-w64-mingw32.shared-qtwebkit \
+	mxe-i686-w64-mingw32.shared-qtwinextras \
+	mxe-i686-w64-mingw32.shared-qttranslations \
+	mxe-i686-w64-mingw32.shared-qttools \
+	mxe-i686-w64-mingw32.shared-qtbase \
+	mxe-i686-w64-mingw32.shared-nsis
 
 cd ${TRAVIS_BUILD_DIR}/..
 ln -s /usr/lib/mxe .
 
 # somehow we aren't finding the Qt configuration (which is outdated - 5.8.0)
 find /usr/lib/mxe/usr/i686-w64-mingw32.shared/qt5/lib
-
-exit 1
 
 # now set up our other dependencies
 

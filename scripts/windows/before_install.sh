@@ -16,7 +16,7 @@ cd ${TRAVIS_BUILD_DIR}/..
 ln -s /usr/lib/mxe .
 
 # somehow we aren't finding the Qt configuration (which is outdated - 5.8.0)
-find /usr/lib/mxe
+find /usr/lib/mxe/usr/i686-w64-mingw32.shared/qt5/lib
 
 exit 1
 

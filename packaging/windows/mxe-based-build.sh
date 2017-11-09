@@ -41,7 +41,6 @@
 #
 # ~/src/mxe                    <- MXE git with Qt5, automake (see above)
 #      /grantlee               <- Grantlee 5.0.0 sources from git
-#      /libssh2                <- from git - v1.6 seems to work
 #      /libcurl                <- from git - 7.42.1 seems to work - rename folder!
 #      /subsurface             <- current subsurface git
 #      /libdivecomputer        <- appropriate libdc/Subsurface-branch branch
@@ -142,27 +141,6 @@ if [[ ! -d grantlee || -f build.grantlee ]] ; then
 fi
 
 
-# libssh2:
-
-cd "$BUILDDIR"
-if [[ ! -d libssh2 || -f build.libssh2 ]] ; then
-	rm -f build.libssh2
-	mkdir -p libssh2
-	cd libssh2
-
-	i686-w64-mingw32.shared-cmake -DCMAKE_TOOLCHAIN_FILE="$BASEDIR"/"$MXEDIR"/usr/i686-w64-mingw32.shared/share/cmake/mxe-conf.cmake \
-		-DCMAKE_BUILD_TYPE=$RELEASE \
-		-DBUILD_EXAMPLES=OFF \
-		-DBUILD_TESTING=OFF \
-		-DBUILD_SHARED_LIBS=ON \
-		"$BASEDIR"/libssh2
-	make $JOBS
-	make install
-	# don't install your dlls in bin, please
-	cp "$BASEDIR"/"$MXEDIR"/usr/i686-w64-mingw32.shared/bin/libssh2.dll "$BASEDIR"/"$MXEDIR"/usr/i686-w64-mingw32.shared/lib
-fi
-
-
 # libcurl
 
 cd "$BUILDDIR"
@@ -185,8 +163,7 @@ if [[ ! -d libcurl || -f build.libcurl ]] ; then
 		--disable-smb \
 		--disable-smtp \
 		--disable-gopher \
-		--disable-manual \
-		--with-libssh2="$BASEDIR"/"$MXEDIR"/usr/i686-w64-mingw32.shared/
+		--disable-manual
 
 	# now remove building the executable
 	sed -i 's/SUBDIRS = lib src include/SUBDIRS = lib include/' Makefile

@@ -21,6 +21,7 @@ sudo apt-get --yes install upx-ucl \
 	mxe-i686-w64-mingw32.shared-qttranslations \
 	mxe-i686-w64-mingw32.shared-qttools \
 	mxe-i686-w64-mingw32.shared-qtbase \
+	mxe-i686-w64-mingw32.shared-openssl \
 	mxe-i686-w64-mingw32.shared-nsis
 
 cd ${TRAVIS_BUILD_DIR}/..
@@ -40,8 +41,6 @@ CURRENT_LIBZIP="1.2.0"
 CURRENT_HIDAPI="hidapi-0.7.0"
 CURRENT_LIBCURL="curl-7_54_1"
 CURRENT_LIBUSB="v1.0.21"
-CURRENT_OPENSSL="OpenSSL_1_1_0f"
-CURRENT_LIBSSH2="libssh2-1.8.0"
 CURRENT_LIBGIT2="v0.26.0"
 
 
@@ -77,15 +76,6 @@ if ! git checkout $CURRENT_LIBUSB ; then
 	exit 1
 fi
 
-echo "Get openssl"
-cd ${TRAVIS_BUILD_DIR}/..
-git clone https://github.com/openssl/openssl
-cd openssl
-if ! git checkout $CURRENT_OPENSSL ; then
-	echo "Can't find the right tag in openssl - giving up"
-	exit 1
-fi
-
 echo "Get libgit2"
 cd ${TRAVIS_BUILD_DIR}/..
 git clone https://github.com/libgit2/libgit2.git
@@ -105,14 +95,5 @@ git clone https://github.com/steveire/grantlee.git
 cd grantlee
 if ! git checkout v5.0.0 ; then
 	echo "can't check out v5.0.0 of grantlee -- giving up"
-	exit 1
-fi
-
-echo "Get libssh2"
-cd ${TRAVIS_BUILD_DIR}/..
-git clone https://github.com/libssh2/libssh2
-cd libssh2
-if ! git checkout $CURRENT_LIBSSH2 ; then
-	echo "Can't find the right tag in libssh2 - giving up"
 	exit 1
 fi

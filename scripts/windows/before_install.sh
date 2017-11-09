@@ -98,3 +98,11 @@ if ! git checkout v5.0.0 ; then
 	exit 1
 fi
 
+echo "Get libssh2"
+cd ${TRAVIS_BUILD_DIR}/..
+git clone https://github.com/libssh2/libssh2
+cd libssh2
+if ! git checkout $CURRENT_LIBSSH2 ; then
+	echo "Can't find the right tag in libssh2 - giving up"
+	exit 1
+fi

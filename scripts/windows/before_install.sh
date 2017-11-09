@@ -48,6 +48,12 @@ CURRENT_LIBGIT2="v0.26.0"
 echo "Get libdivecomputer"
 cd ${TRAVIS_BUILD_DIR}/..
 git clone -b Subsurface-branch https://github.com/Subsurface-divelog/libdc.git libdivecomputer
+cd libdivecomputer
+if [ ! -f ./configure ] ; then
+        autoreconf --install .
+        autoreconf --install . # not a typo - somehow/sometimes libdivecomputer needs to run this twice. Don't ask.
+fi
+
 
 echo "Get libcurl"
 cd ${TRAVIS_BUILD_DIR}/..
@@ -57,6 +63,10 @@ if ! git checkout $CURRENT_LIBCURL ; then
 	echo "Can't find the right tag in libcurl - giving up"
 	exit 1
 fi
+if [ ! -f ./configure ] ; then
+        autoreconf --install .
+fi
+
 
 echo "Get libusb"
 cd ${TRAVIS_BUILD_DIR}/..

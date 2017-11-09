@@ -41,7 +41,6 @@
 #
 # ~/src/mxe                    <- MXE git with Qt5, automake (see above)
 #      /grantlee               <- Grantlee 5.0.0 sources from git
-#      /libcurl                <- from git - 7.42.1 seems to work - rename folder!
 #      /subsurface             <- current subsurface git
 #      /libdivecomputer        <- appropriate libdc/Subsurface-branch branch
 #      /libgit2                <- libgit2 0.23.1 or similar
@@ -139,39 +138,6 @@ if [[ ! -d grantlee || -f build.grantlee ]] ; then
 	make $JOBS
 	make install
 fi
-
-
-# libcurl
-
-cd "$BUILDDIR"
-if [[ ! -d libcurl || -f build.libcurl ]] ; then
-	rm -f build.libcurl
-	mkdir -p libcurl
-	cd libcurl
-	"$BASEDIR"/libcurl/configure --host=i686-w64-mingw32.shared \
-		--prefix="$BASEDIR"/"$MXEDIR"/usr/i686-w64-mingw32.shared/ \
-		--disable-ftp \
-		--disable-ldap \
-		--disable-ldaps \
-		--disable-rtsp \
-		--enable-proxy \
-		--enable-dict \
-		--disable-telnet \
-		--disable-tftp \
-		--disable-pop3 \
-		--disable-imap \
-		--disable-smb \
-		--disable-smtp \
-		--disable-gopher \
-		--disable-manual
-
-	# now remove building the executable
-	sed -i 's/SUBDIRS = lib src include/SUBDIRS = lib include/' Makefile
-
-	make $JOBS
-	make install
-fi
-
 
 # libgit2:
 

@@ -21,7 +21,8 @@ sudo apt-get --yes install upx-ucl \
 	mxe-i686-w64-mingw32.shared-qttranslations \
 	mxe-i686-w64-mingw32.shared-qttools \
 	mxe-i686-w64-mingw32.shared-qtbase \
-	mxe-i686-w64-mingw32.shared-openssl \
+	mxe-i686-w64-mingw32.shared-gnutls \
+	mxe-i686-w64-mingw32.shared-curl \
 	mxe-i686-w64-mingw32.shared-nsis
 
 cd ${TRAVIS_BUILD_DIR}/..

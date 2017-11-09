@@ -170,7 +170,7 @@ if [[ ! -d libcurl || -f build.libcurl ]] ; then
 	rm -f build.libcurl
 	mkdir -p libcurl
 	cd libcurl
-	../../libcurl/configure --host=i686-w64-mingw32.shared \
+	"$BASEDIR"/libcurl/configure --host=i686-w64-mingw32.shared \
 		--prefix="$BASEDIR"/"$MXEDIR"/usr/i686-w64-mingw32.shared/ \
 		--disable-ftp \
 		--disable-ldap \

@@ -2,6 +2,12 @@
 
 set -x
 
+# Travis only pulls shallow repos. But that messes with git describe.
+# Sorry Travis, fetching the whole thing and the tags as well...
+git fetch --unshallow
+git pull --tags
+git describe
+
 # grab our own custom MXE environment
 cd ${TRAVIS_BUILD_DIR}/..
 echo "Downloading prebuilt MXE environment from Subsurface-divelog.org"

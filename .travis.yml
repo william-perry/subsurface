@@ -6,7 +6,7 @@ matrix:
       dist: trusty
       sudo: required
       language: c++
-
+  exclude:
     - env: SUBSURFACE_PLATFORM='linux'
       os: linux
       dist: trusty

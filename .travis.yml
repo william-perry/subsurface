@@ -6,6 +6,33 @@ matrix:
       dist: trusty
       language: c++
       cache: ${TRAVIS_BUILD_DIR}/../mxe/usr
+      addons:
+        apt:
+          packages:
+            - git
+            - p7zip-full
+            - autopoint
+            - gperf
+            - intltool
+            - autoconf
+            - automake
+            - libffi-dev
+            - libgdk-pixbuf2.0-dev
+            - libtool
+            - libltdl-dev
+            - libssl-dev
+            - libxml-parser-perl
+            - openssl
+            - patch
+            - perl
+            - pkg-config
+            - python
+            - ruby
+            - scons
+            - sed
+            - unzip
+            - wget
+            - xz-utils
 
 before_install:
     - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/create-mxe.sh

@@ -20,5 +20,5 @@ EOT
 
 /usr/bin/cat settings.mk
 
-make -j 4
+travis_wait 120 make -j 4
 

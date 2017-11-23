@@ -1,18 +1,5 @@
-
-
 matrix:
   include:
-    - env: SUBSURFACE_PLATFORM='mac'
-      os: osx
-      osx_image: xcode6.4
-      language: c++ ruby
-
-    - env: SUBSURFACE_PLATFORM='windows'
-      os: linux
-      dist: trusty
-      sudo: required
-      language: c++
-
     - env: SUBSURFACE_PLATFORM='linux'
       os: linux
       dist: trusty
@@ -46,36 +33,19 @@ matrix:
             # Not a subsurface dependency, but a QtWebKit dependency
             - libhyphen-dev
             - libicu52
-            # For SmartTrak import
-            - libglib2.0-dev
-            - mdbtools-dev
-
-    - env: SUBSURFACE_PLATFORM="android"
-      # Currently hard coded to arm
-      os: linux
-      language: c++
-      filter_secrets: false
-      services:
-          - docker
-# TODO: caching
-#      cache:
-#          timeout: 300
-#          directories:
-#              - 3pp
-
-    - env: SUBSURFACE_PLATFORM="qt55"
-      # Currently hard coded to arm
-      os: linux
-      language: c++
-      filter_secrets: false
-      services:
-          - docker
+        coverity_scan:
+          project:
+            name: "Subsurface-divelog/subsurface"
+            description: "Build submitted via Travis CI"
+          notification_email: glance@acc.umu.se
+          build_command: bash ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/travisbuild.sh
+          branch_pattern: coverity_scan
 
 before_install:
     - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/before_install.sh
 
 script:
-    - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/travisbuild.sh
+    - if [ "$COVERITY_SCAN_BRANCH" != "1" ] ; then source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/travisbuild.sh ; fi
 
 after_success:
     - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/after_success.sh

@@ -50,6 +50,8 @@ matrix:
     - env: SUBSURFACE_PLATFORM="android"
       # Currently hard coded to arm
       os: linux
+      dist: trusty
+      sudo: required
       language: c++
       services:
           - docker

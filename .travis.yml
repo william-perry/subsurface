@@ -1,3 +1,9 @@
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "Cb8+XTvcKMccvabQXQR2F1F5PNl9dZoe98Q66awS2DEHQIisUllMwZnMXyGtb3sbzJcWkilTPamSc6WBXO748hjH1uHdu9yFo4oQKBtq73gx5sRX51XTZSO4OfJipRJxSVkShnEA+YklwQBugOEkxfeRafpM68tbz6pAMoR8eHDKLsNa0wHjRfh+BEUKxaNEPxhWg3+41FSvUUeBf3fbqa6PWK5UwKIFCFh419X4gDyxTOEtm5OiIwYokruRGHxG0rZaMDHFcgjHBZ47WUXR0xIejh5j+L/vNGkcEoG6+96Hh5TR0rg9PaKdcWOUMt8VIO1pBZ1IrfGVdqgM6Yypb6ZrbJi3EEnAM6AxbUyJRW6410ZwcU0yVuNKDe/fMvhAjVlhsd+xjXuk2jfYKdhs/A45LwyK1Qt1vCXL8gFn/Dzgq+NIw8YyX9vL70J0t2cGQEwGTFiuD+5KaO35hyQm740bdw3FUCmFpVOYtq4iJMBDa12F4S9IMI8OvAmCXh2Mg/u3XVx9imDyBjwS4UrX63ny6rMftajdzCFl3FUyAsKcYl54ve1jVQtpoiQdrYuzlbRYXH/MvQ84ZKNclsFt84XayuL+y6Ds8+lyuEPOnJhpmZS0pt54X4YQSK0Yw49poNYBQHGTRKqOWnWSFDeFRlqki6WFnzqDek3lKRIu8iw="
+
 matrix:
   include:
     - env: SUBSURFACE_PLATFORM='linux'

@@ -49,11 +49,10 @@ matrix:
 
 before_install:
     # When the build on this branch gets triggered by travis-cron, do a coverty scan.
-    - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] ; then export COVERITY_SCAN_BRANCH=1 ; fi
     - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/before_install.sh
 
 script:
-    - if [ "$COVERITY_SCAN_BRANCH" != "1" ] ; then source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/travisbuild.sh ; fi
+    - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/travisbuild.sh
 
 after_success:
     - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/after_success.sh

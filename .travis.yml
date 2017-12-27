@@ -43,19 +43,22 @@ matrix:
           project:
             name: "Subsurface-divelog/subsurface"
             description: "Build submitted via Travis CI"
-          notification_email: glance@acc.umu.se
-          build_command: bash ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/travisbuild.sh
+          notification_email: coverity@subsurface-divelog.org
+          build_command: bash ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/travisbuild.sh -no-deps
           branch_pattern: coverity_scan
 
 before_install:
     # When the build on this branch gets triggered by travis-cron, do a coverty scan.
     - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/before_install.sh
+    - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/travisbuild.sh -only-deps
 
 script:
-    - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/travisbuild.sh
+    echo "built in coverity_scan section"
+    # - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/travisbuild.sh
 
 after_success:
-    - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/after_success.sh
+    echo "don't post binaries"
+    # - source ${TRAVIS_BUILD_DIR}/scripts/${SUBSURFACE_PLATFORM}/after_success.sh
 
 branches:
   except:

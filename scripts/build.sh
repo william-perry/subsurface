@@ -14,6 +14,13 @@
 # create a log file of the build
 exec 1> >(tee build.log) 2>&1
 
+CURRENTWD=$(pwd)
+
+# if someone starts this script inside the subsurface directory, just go up a level
+if [ "$(basename $(pwd))" = "subsurface" ] ; then
+	cd ..
+fi
+
 SRC=$(pwd)
 PLATFORM=$(uname)
 
@@ -527,3 +534,4 @@ if [ -z "$ONLY_DEPS" ] ; then
 else
 	echo "Done building the dependencies, did not build libdivecomputer and Subsurface"
 fi
+cd $CURRENTWD

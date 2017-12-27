@@ -59,6 +59,16 @@ while [[ $# -gt 0 ]] ; do
 			# hack for Travix Mac build
 			SKIP_GOOGLEMAPS="1"
 			;;
+		-only-deps)
+			# for Coverity build we want a mode to just build Subsurface and libdivecomputer (those will be analyzed),
+			# and build the rest, first.
+			ONLY_DEPS="1"
+			;;
+		-no-deps)
+			# for Coverity build we want a mode to just build Subsurface and libdivecomputer (those will be analyzed),
+			# and build the rest, first.
+			NO_DEPS="1"
+			;;
 		*)
 			echo "Unknown command line argument $arg"
 			;;
@@ -304,25 +314,27 @@ if [[ $PLATFORM = Darwin || "$LIBGIT" < "24" ]] ; then
 
 	cd $SRC
 
-	if [ ! -d libgit2 ] ; then
-		if [[ $1 = local ]] ; then
-			git clone $SRC/../libgit2 libgit2
-		else
-			git clone https://github.com/libgit2/libgit2.git
+	if [ -z "$NO_DEPS" ] ; then
+		if [ ! -d libgit2 ] ; then
+			if [[ $1 = local ]] ; then
+				git clone $SRC/../libgit2 libgit2
+			else
+				git clone https://github.com/libgit2/libgit2.git
+			fi
 		fi
+		cd libgit2
+		# let's build with a recent enough version of master for the latest features
+		git fetch origin
+		if ! git checkout $CURRENT_LIBGIT2 ; then
+			echo "Can't find the right tag in libgit2 - giving up"
+			exit 1
+		fi
+		mkdir -p build
+		cd build
+		cmake $OLDER_MAC_CMAKE -DCMAKE_INSTALL_PREFIX=$INSTALL_ROOT -DCMAKE_BUILD_TYPE=Release -DBUILD_CLAR=OFF ..
+		make -j4
+		make install
 	fi
-	cd libgit2
-	# let's build with a recent enough version of master for the latest features
-	git fetch origin
-	if ! git checkout $CURRENT_LIBGIT2 ; then
-		echo "Can't find the right tag in libgit2 - giving up"
-		exit 1
-	fi
-	mkdir -p build
-	cd build
-	cmake $OLDER_MAC_CMAKE -DCMAKE_INSTALL_PREFIX=$INSTALL_ROOT -DCMAKE_BUILD_TYPE=Release -DBUILD_CLAR=OFF ..
-	make -j4
-	make install
 
 	if [ $PLATFORM = Darwin ] ; then
 		# in order for macdeployqt to do its job correctly, we need the full path in the dylib ID
@@ -339,28 +351,30 @@ cd $SRC
 
 # build libdivecomputer
 
-cd subsurface
+if [ -z "$ONLY_DEPS" ] ; then
+	cd subsurface
 
-if [ ! -d libdivecomputer/src ] ; then
-	git submodule init
-	git submodule update --recursive
+	if [ ! -d libdivecomputer/src ] ; then
+		git submodule init
+		git submodule update --recursive
+	fi
+
+	cd libdivecomputer
+
+	mkdir -p build
+	cd build
+
+	if [ ! -f ../configure ] ; then
+		# this is not a typo
+		# in some scenarios it appears that autoreconf doesn't copy the
+		# ltmain.sh file; running it twice, however, fixes that problem
+		autoreconf --install ..
+		autoreconf --install ..
+	fi
+	CFLAGS="$OLDER_MAC -I$INSTALL_ROOT/include $LIBDC_CFLAGS" ../configure --prefix=$INSTALL_ROOT --disable-examples
+	make -j4
+	make install
 fi
-
-cd libdivecomputer
-
-mkdir -p build
-cd build
-
-if [ ! -f ../configure ] ; then
-	# this is not a typo
-	# in some scenarios it appears that autoreconf doesn't copy the
-	# ltmain.sh file; running it twice, however, fixes that problem
-	autoreconf --install ..
-	autoreconf --install ..
-fi
-CFLAGS="$OLDER_MAC -I$INSTALL_ROOT/include $LIBDC_CFLAGS" ../configure --prefix=$INSTALL_ROOT --disable-examples
-make -j4
-make install
 
 if [ $PLATFORM = Darwin ] ; then
 	if [ -z "$CMAKE_PREFIX_PATH" ] ; then
@@ -401,28 +415,30 @@ if [ "$BUILDGRANTLEE" = "1" ] ; then
 	# build grantlee
 	PRINTING="-DNO_PRINTING=OFF"
 
-	cd $SRC
+	if [ -z "$NO_DEPS" ] ; then
+		cd $SRC
 
-	if [ ! -d grantlee ] ; then
-		if [[ $1 = local ]] ; then
-			git clone $SRC/../grantlee grantlee
-		else
-			git clone https://github.com/steveire/grantlee.git
+		if [ ! -d grantlee ] ; then
+			if [[ $1 = local ]] ; then
+				git clone $SRC/../grantlee grantlee
+			else
+				git clone https://github.com/steveire/grantlee.git
+			fi
 		fi
+		cd grantlee
+		if ! git checkout v5.0.0 ; then
+			echo "can't check out v5.0.0 of grantlee -- giving up"
+			exit 1
+		fi
+		mkdir -p build
+		cd build
+		cmake $OLDER_MAC_CMAKE -DCMAKE_BUILD_TYPE=Release \
+			-DCMAKE_INSTALL_PREFIX=$INSTALL_ROOT \
+			-DBUILD_TESTS=NO \
+			$SRC/grantlee
+		make -j4
+		make install
 	fi
-	cd grantlee
-	if ! git checkout v5.0.0 ; then
-		echo "can't check out v5.0.0 of grantlee -- giving up"
-		exit 1
-	fi
-	mkdir -p build
-	cd build
-	cmake $OLDER_MAC_CMAKE -DCMAKE_BUILD_TYPE=Release \
-		-DCMAKE_INSTALL_PREFIX=$INSTALL_ROOT \
-		-DBUILD_TESTS=NO \
-		$SRC/grantlee
-	make -j4
-	make install
 else
 	PRINTING="-DNO_PRINTING=ON"
 fi
@@ -430,78 +446,84 @@ fi
 if [ "$SKIP_GOOGLEMAPS" != "1" ] ; then
 	# build the googlemaps map plugin
 
-	cd $SRC
-	if [ ! -d googlemaps ] ; then
-		if [[ $1 = local ]] ; then
-			git clone $SRC/../googlemaps googlemaps
-		else
-			git clone https://github.com/Subsurface-divelog/googlemaps.git
+	if [ -z "$NO_DEPS" ] ; then
+		cd $SRC
+		if [ ! -d googlemaps ] ; then
+			if [[ $1 = local ]] ; then
+				git clone $SRC/../googlemaps googlemaps
+			else
+				git clone https://github.com/Subsurface-divelog/googlemaps.git
+			fi
 		fi
-	fi
-	cd googlemaps
-	git checkout master
-	git pull --rebase
+		cd googlemaps
+		git checkout master
+		git pull --rebase
 
-	mkdir -p build
-	cd build
-	$QMAKE -query
-	$QMAKE "INCLUDEPATH=$INSTALL_ROOT/include" ../googlemaps.pro
-	# on Travis the compiler doesn't support c++1z, yet qmake adds that flag;
-	# since things compile fine with c++11, let's just hack that away
-	# similarly, don't use -Wdata-time
-	mv Makefile Makefile.bak
-	cat Makefile.bak | sed -e 's/std=c++1z/std=c++11/g ; s/-Wdate-time//' > Makefile
-	make -j4
-	make install
+		mkdir -p build
+		cd build
+		$QMAKE -query
+		$QMAKE "INCLUDEPATH=$INSTALL_ROOT/include" ../googlemaps.pro
+		# on Travis the compiler doesn't support c++1z, yet qmake adds that flag;
+		# since things compile fine with c++11, let's just hack that away
+		# similarly, don't use -Wdata-time
+		mv Makefile Makefile.bak
+		cat Makefile.bak | sed -e 's/std=c++1z/std=c++11/g ; s/-Wdate-time//' > Makefile
+		make -j4
+		make install
+	fi
 fi
 
 # finally, build Subsurface
 
 set -x
 
-cd $SRC/subsurface
-for (( i=0 ; i < ${#BUILDS[@]} ; i++ )) ; do
-	SUBSURFACE_EXECUTABLE=${BUILDS[$i]}
-	BUILDDIR=${BUILDDIRS[$i]}
-	echo "build $SUBSURFACE_EXECUTABLE in $BUILDDIR"
+if [ -z "$ONLY_DEPS" ] ; then
+	cd $SRC/subsurface
+	for (( i=0 ; i < ${#BUILDS[@]} ; i++ )) ; do
+		SUBSURFACE_EXECUTABLE=${BUILDS[$i]}
+		BUILDDIR=${BUILDDIRS[$i]}
+		echo "build $SUBSURFACE_EXECUTABLE in $BUILDDIR"
 
-	# pull the plasma-mobile components from upstream if building Subsurface-mobile
-	if [ "$SUBSURFACE_EXECUTABLE" = "MobileExecutable" ] ; then
-		cd $SRC/subsurface
-		bash ./scripts/mobilecomponents.sh
-	fi
+		# pull the plasma-mobile components from upstream if building Subsurface-mobile
+		if [ "$SUBSURFACE_EXECUTABLE" = "MobileExecutable" ] ; then
+			cd $SRC/subsurface
+			bash ./scripts/mobilecomponents.sh
+		fi
 
-	mkdir -p $SRC/subsurface/$BUILDDIR
-	cd $SRC/subsurface/$BUILDDIR
-	export CMAKE_PREFIX_PATH="$INSTALL_ROOT/lib/cmake;${CMAKE_PREFIX_PATH}"
-	cmake -DCMAKE_BUILD_TYPE=Debug .. \
-		-DSUBSURFACE_TARGET_EXECUTABLE=$SUBSURFACE_EXECUTABLE \
-		${LIBGIT_ARGS} \
-		-DLIBDIVECOMPUTER_INCLUDE_DIR=$INSTALL_ROOT/include \
-		-DLIBDIVECOMPUTER_LIBRARIES=$INSTALL_ROOT/lib/libdivecomputer.a \
-		-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH \
-		-DBTSUPPORT=${BTSUPPORT} \
-		-DCMAKE_INSTALL_PREFIX=${INSTALL_ROOT} \
-		-DLIBGIT2_FROM_PKGCONFIG=ON \
-		-DFORCE_LIBSSH=OFF \
-		$PRINTING $EXTRA_OPTS
+		mkdir -p $SRC/subsurface/$BUILDDIR
+		cd $SRC/subsurface/$BUILDDIR
+		export CMAKE_PREFIX_PATH="$INSTALL_ROOT/lib/cmake;${CMAKE_PREFIX_PATH}"
+		cmake -DCMAKE_BUILD_TYPE=Debug .. \
+			-DSUBSURFACE_TARGET_EXECUTABLE=$SUBSURFACE_EXECUTABLE \
+			${LIBGIT_ARGS} \
+			-DLIBDIVECOMPUTER_INCLUDE_DIR=$INSTALL_ROOT/include \
+			-DLIBDIVECOMPUTER_LIBRARIES=$INSTALL_ROOT/lib/libdivecomputer.a \
+			-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH \
+			-DBTSUPPORT=${BTSUPPORT} \
+			-DCMAKE_INSTALL_PREFIX=${INSTALL_ROOT} \
+			-DLIBGIT2_FROM_PKGCONFIG=ON \
+			-DFORCE_LIBSSH=OFF \
+			$PRINTING $EXTRA_OPTS
 
-	if [ $PLATFORM = Darwin ] ; then
-		rm -rf Subsurface.app
-		rm -rf Subsurface-mobile.app
-	fi
+		if [ $PLATFORM = Darwin ] ; then
+			rm -rf Subsurface.app
+			rm -rf Subsurface-mobile.app
+		fi
 
-	LIBRARY_PATH=$INSTALL_ROOT/lib make -j4
-	LIBRARY_PATH=$INSTALL_ROOT/lib make install
+		LIBRARY_PATH=$INSTALL_ROOT/lib make -j4
+		LIBRARY_PATH=$INSTALL_ROOT/lib make install
 
-	if [ "$CREATE_APPDIR" = "1" ] ; then
-		# if we create an AppImage this makes gives us a sane starting point
-		cd $SRC
-		mkdir -p ./appdir
-		mkdir -p appdir/usr/share/metainfo
-		mkdir -p appdir/usr/share/icons/hicolor/256x256/apps
-		cp -r ./install-root/* ./appdir/usr
-		cp subsurface/appdata/subsurface.appdata.xml appdir/usr/share/metainfo/
-		cp subsurface/icons/subsurface-icon.png appdir/usr/share/icons/hicolor/256x256/apps/
-	fi
-done
+		if [ "$CREATE_APPDIR" = "1" ] ; then
+			# if we create an AppImage this makes gives us a sane starting point
+			cd $SRC
+			mkdir -p ./appdir
+			mkdir -p appdir/usr/share/metainfo
+			mkdir -p appdir/usr/share/icons/hicolor/256x256/apps
+			cp -r ./install-root/* ./appdir/usr
+			cp subsurface/appdata/subsurface.appdata.xml appdir/usr/share/metainfo/
+			cp subsurface/icons/subsurface-icon.png appdir/usr/share/icons/hicolor/256x256/apps/
+		fi
+	done
+else
+	echo "Done building the dependencies, did not build libdivecomputer and Subsurface"
+fi

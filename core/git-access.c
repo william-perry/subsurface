@@ -748,6 +748,7 @@ static git_repository *create_local_repo(const char *localdir, const char *remot
 		opts.fetch_opts.callbacks.credentials = credential_https_cb;
 	opts.repository_cb = repository_create_cb;
 	opts.fetch_opts.callbacks.certificate_check = certificate_check_cb;
+	opts.fetch_opts.proxy_opts.type = GIT_PROXY_AUTO;
 
 	opts.checkout_branch = branch;
 	if (is_subsurface_cloud && !canReachCloudServer())

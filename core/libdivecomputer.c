@@ -1076,6 +1076,7 @@ const char *do_libdivecomputer_import(device_data_t *data)
 	first_temp_is_air = 0;
 	data->device = NULL;
 	data->context = NULL;
+	data->iostream = NULL;
 
 	if (data->libdc_log && logfile_name)
 		fp = subsurface_fopen(logfile_name, "w");
@@ -1095,10 +1096,9 @@ const char *do_libdivecomputer_import(device_data_t *data)
 
 	err = translate("gettextFromC", "Unable to open %s %s (%s)");
 
-#if defined(SSRF_CUSTOM_IO)
 	if (data->bluetooth_mode) {
-#if defined(BT_SUPPORT) && defined(SSRF_CUSTOM_IO)
-		rc = dc_context_set_custom_io(data->context, get_qt_serial_ops(), data);
+#if defined(BT_SUPPORT)
+		rc = ble_packet_open(&data->iostream, data->context, data->devname, data);
 #endif
 #ifdef SERIAL_FTDI
 	} else if (!strcmp(data->devname, "ftdi")) {
@@ -1112,10 +1112,7 @@ const char *do_libdivecomputer_import(device_data_t *data)
 	if (rc != DC_STATUS_SUCCESS) {
 		report_error(errmsg(rc));
 	} else {
-#else
-	{
-#endif
-		rc = dc_device_open(&data->device, data->context, data->descriptor, data->devname);
+		rc = dc_device_open(&data->device, data->context, data->descriptor, data->iostream);
 		INFO(0, "dc_deveice_open error value of %d", rc);
 		if (rc != DC_STATUS_SUCCESS && subsurface_access(data->devname, R_OK | W_OK) != 0)
 			err = translate("gettextFromC", "Error opening the device %s %s (%s).\nIn most cases, in order to debug this issue, a libdivecomputer logfile will be useful.\nYou can create this logfile by selecting the corresponding checkbox in the download dialog.");
@@ -1126,6 +1123,8 @@ const char *do_libdivecomputer_import(device_data_t *data)
 		/* TODO: Show the logfile to the user on error. */
 		dc_device_close(data->device);
 		data->device = NULL;
+		dc_iostream_close(data->iostream);
+		data->iostream = NULL;
 		if (!downloadTable.nr)
 			dev_info(data, translate("gettextFromC", "No new dives downloaded from dive computer"));
 	}

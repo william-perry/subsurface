@@ -624,13 +624,6 @@ rfcomm_stream_open(dc_iostream_t **iostream, dc_context_t *context, const char* 
 		qt_serial_close, /* close */
 	};
 
-#if 0
-#ifdef BLE_SUPPORT
-	if (!strncmp(devaddr, "LE:", 3))
-		return ble_serial_open(io, context, devaddr);
-#endif
-#endif
-
 	rc = qt_serial_open(&io, context, devaddr);
 	if (rc != DC_STATUS_SUCCESS) {
 		return rc;

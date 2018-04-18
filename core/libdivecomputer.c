@@ -17,6 +17,8 @@
 #include <libdivecomputer/version.h>
 #include <libdivecomputer/usbhid.h>
 #include <libdivecomputer/serial.h>
+#include <libdivecomputer/irda.h>
+
 #include "libdivecomputer.h"
 #include "core/version.h"
 
@@ -1120,6 +1122,27 @@ dc_status_t divecomputer_device_open(device_data_t *data)
 				return rc;
 		}
 #endif
+	}
+
+	if (transports & DC_TRANSPORT_IRDA) {
+		unsigned int address = 0;
+
+		dc_iterator_t *iterator = NULL;
+		dc_irda_device_t *device = NULL;
+		dc_irda_iterator_new (&iterator, context, descriptor);
+		while (dc_iterator_next (iterator, &device) == DC_STATUS_SUCCESS) {
+			address = dc_irda_device_get_address (device);
+			dc_irda_device_free (device);
+			break;
+		}
+		dc_iterator_free (iterator);
+
+		if (!address)
+			address = strtoul(data->devname, NULL, 0);
+
+		rc = dc_irda_open(&data->iostream, context, address, 1);
+		if (rc == DC_STATUS_SUCCESS)
+			return rc;
 	}
 
 	return DC_STATUS_UNSUPPORTED;

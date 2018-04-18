@@ -15,7 +15,7 @@
 	#include <winsock2.h>
 	#include <windows.h>
 	#include <ws2bth.h>
-#endif
+#endif /* Q_OS_WIN */
 
 #ifdef BLE_SUPPORT
 # include "qt-ble.h"
@@ -37,7 +37,7 @@ typedef struct qt_serial_t {
 	SOCKET socket;
 #else
 	QBluetoothSocket *socket;
-#endif
+#endif /* Q_OS_WIN */
 	long timeout;
 } qt_serial_t;
 
@@ -181,6 +181,7 @@ static dc_status_t ble_serial_set_timeout(void *io, int timeout)
 	/* Do we care? */
 	return DC_STATUS_SUCCESS;
 }
+#endif /* BLE_SUPPORT */
 
 static dc_status_t qt_serial_open(qt_serial_t **io, dc_context_t *context, const char* devaddr)
 {
@@ -290,7 +291,7 @@ static dc_status_t qt_serial_open(qt_serial_t **io, dc_context_t *context, const
 	serial_port->socket->connectToService(remoteDeviceAddress, uuid, QIODevice::ReadWrite | QIODevice::Unbuffered);
 #else
 	serial_port->socket->connectToService(remoteDeviceAddress, 1, QIODevice::ReadWrite | QIODevice::Unbuffered);
-#endif
+#endif /* Q_OS_ANDROID */
 	timer.start(msec);
 	loop.exec();
 
@@ -301,7 +302,7 @@ static dc_status_t qt_serial_open(qt_serial_t **io, dc_context_t *context, const
 		timer.start(4 * msec);
 		loop.exec();
 	}
-#endif
+#endif /* defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID) */
 	if (serial_port->socket->state() != QBluetoothSocket::ConnectedState) {
 
 		// Get the latest error and try to match it with one from libdivecomputer
@@ -325,7 +326,7 @@ static dc_status_t qt_serial_open(qt_serial_t **io, dc_context_t *context, const
 			return DC_STATUS_IO;
 		}
 	}
-#endif
+#endif /* Q_OS_WIN */
 
 	*io = serial_port;
 
@@ -353,7 +354,7 @@ static dc_status_t qt_serial_close(void *io)
 
 	delete device->socket;
 	free(device);
-#endif
+#endif /* Q_OS_WIN */
 
 	return DC_STATUS_SUCCESS;
 }
@@ -412,7 +413,7 @@ static dc_status_t qt_serial_read(void *io, void* data, size_t size, size_t *act
 
 		nbytes += rc;
 	}
-#endif
+#endif /* Q_OS_WIN */
 	if (actual)
 		*actual = nbytes;
 
@@ -461,7 +462,7 @@ static dc_status_t qt_serial_write(void *io, const void* data, size_t size, size
 
 		nbytes += rc;
 	}
-#endif
+#endif /* Q_OS_WIN */
 	if (actual)
 		*actual = nbytes;
 
@@ -478,7 +479,7 @@ static dc_status_t qt_serial_purge(void *io, dc_direction_t queue)
 #if !defined(Q_OS_WIN)
 	if (device->socket == NULL)
 		return DC_STATUS_INVALIDARGS;
-#endif
+#endif /* Q_OS_WIN */
 	// TODO: add implementation
 
 	return DC_STATUS_SUCCESS;
@@ -500,7 +501,7 @@ static dc_status_t qt_serial_get_available(void *io, size_t *available)
 		return DC_STATUS_INVALIDARGS;
 
 	*available = device->socket->bytesAvailable();
-#endif
+#endif /* Q_OS_WIN */
 
 	return DC_STATUS_SUCCESS;
 }
@@ -522,7 +523,7 @@ static int qt_serial_get_transmitted(qt_serial_t *device)
 		return DC_STATUS_INVALIDARGS;
 
 	return device->socket->bytesToWrite();
-#endif
+#endif /* Q_OS_WIN */
 }
 
 static dc_status_t qt_serial_set_timeout(void *io, int timeout)
@@ -537,8 +538,7 @@ static dc_status_t qt_serial_set_timeout(void *io, int timeout)
 	return DC_STATUS_SUCCESS;
 }
 
-#endif
-
+#if defined(BLE_SUPPORT)
 dc_status_t
 ble_packet_open(dc_iostream_t **iostream, dc_context_t *context, const char* devaddr, void *userdata)
 {
@@ -600,6 +600,7 @@ ble_stream_open(dc_iostream_t **iostream, dc_context_t *context, const char* dev
 
 	return dc_custom_open (iostream, context, DC_TRANSPORT_BLE, &callbacks, io);
 }
+#endif /* BLE_SUPPORT */
 
 dc_status_t
 rfcomm_stream_open(dc_iostream_t **iostream, dc_context_t *context, const char* devaddr)

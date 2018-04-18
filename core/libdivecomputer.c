@@ -1063,7 +1063,7 @@ void logfunc(dc_context_t *context, dc_loglevel_t loglevel, const char *file, un
 	}
 }
 
-static dc_status_t divecomputer_device_open(device_data_t *data)
+dc_status_t divecomputer_device_open(device_data_t *data)
 {
 	dc_status_t rc;
 	dc_descriptor_t *descriptor = data->descriptor;

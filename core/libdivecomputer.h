@@ -55,14 +55,11 @@ extern double progress_bar_fraction;
 extern char *logfile_name;
 extern char *dumpfile_name;
 
-dc_status_t
-ble_packet_open(dc_iostream_t **iostream, dc_context_t *context, const char* devaddr, void *userdata);
+dc_status_t ble_packet_open(dc_iostream_t **iostream, dc_context_t *context, const char* devaddr, void *userdata);
+dc_status_t ble_stream_open(dc_iostream_t **iostream, dc_context_t *context, const char* devaddr, void *userdata);
+dc_status_t rfcomm_stream_open(dc_iostream_t **iostream, dc_context_t *context, const char* devaddr);
 
-dc_status_t
-ble_stream_open(dc_iostream_t **iostream, dc_context_t *context, const char* devaddr, void *userdata);
-
-dc_status_t
-rfcomm_stream_open(dc_iostream_t **iostream, dc_context_t *context, const char* devaddr);
+dc_status_t divecomputer_device_open(device_data_t *data);
 
 #ifdef __cplusplus
 }

@@ -635,15 +635,7 @@ QString ConfigureDiveComputer::dc_open(device_data_t *data)
 		fprintf(data->libdc_logfile, "built with libdivecomputer v%s\n", dc_version(NULL));
 	}
 
-	if (data->bluetooth_mode) {
-#if defined(BT_SUPPORT)
-		rc = ble_packet_open(&data->iostream, data->context, data->devname, data);
-#endif
-#ifdef SERIAL_FTDI
-	} else if (!strcmp(data->devname, "ftdi")) {
-		rc = dc_context_set_custom_io(data->context, &serial_ftdi_ops, data);
-#endif
-	}
+	rc = divecomputer_device_open(data);
 
 	if (rc != DC_STATUS_SUCCESS) {
 		report_error(errmsg(rc));

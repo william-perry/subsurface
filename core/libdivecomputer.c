@@ -1115,7 +1115,7 @@ dc_status_t divecomputer_device_open(device_data_t *data)
 
 #ifdef SERIAL_FTDI
 		if (!strcmp(data->devname, "ftdi")) {
-			rc = serial_ftdi_open(&&data->iostream, context);
+			rc = ftdi_open(&data->iostream, context);
 			if (rc == DC_STATUS_SUCCESS)
 				return rc;
 		}

@@ -19,11 +19,3 @@ bash -e -x ./subsurface/scripts/build.sh -desktop -no-bt
 rm -rf subsurface/build
 bash -e -x ./subsurface/scripts/build.sh -mobile
 
-export QT_PLUGIN_PATH=$QT_ROOT/plugins
-export QT_QPA_PLATFORM_PLUGIN_PATH=$QT_ROOT/plugins
-export QT_DEBUG_PLUGINS=1
-
-# for debugging: find $QT_ROOT/plugins
-
-env CTEST_OUTPUT_ON_FAILURE=1 make -C subsurface/build check
-

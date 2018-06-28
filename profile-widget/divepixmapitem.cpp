@@ -26,6 +26,7 @@ CloseButtonItem::CloseButtonItem(QGraphicsItem *parent): DivePixmapItem(parent)
 
 void CloseButtonItem::mousePressEvent(QGraphicsSceneMouseEvent *)
 {
+printf("CloseButtonItem::mousePressEvent\n");
 	qgraphicsitem_cast<DivePictureItem*>(parentItem())->removePicture();
 }
 
@@ -112,6 +113,7 @@ void DivePictureItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void DivePictureItem::removePicture()
 {
+printf("DivePictureItem::removePicture(): %s\n", qPrintable(fileUrl));
 #ifndef SUBSURFACE_MOBILE
 	DivePictureModel::instance()->removePictures({ fileUrl });
 #endif

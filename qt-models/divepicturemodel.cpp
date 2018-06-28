@@ -129,6 +129,7 @@ QVariant DivePictureModel::data(const QModelIndex &index, int role) const
 // Return true if we actually removed a picture
 static bool removePictureFromSelectedDive(const char *fileUrl)
 {
+printf("removePictureFromSelectedDive: %s\n", fileUrl);
 	int i;
 	struct dive *dive;
 	for_each_dive (i, dive) {

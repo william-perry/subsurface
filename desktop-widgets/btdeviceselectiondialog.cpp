@@ -811,7 +811,6 @@ void WinBluetoothDeviceDiscoveryAgent::doWork()
 	HANDLE hLookup;
 	BYTE buffer[4096];
 	WSAQUERYSETW *pResults = (WSAQUERYSETW*)&buffer;
-	DWORD bufferLength = sizeof(buffer);
 
 	lastError = QBluetoothDeviceDiscoveryAgent::NoError;
 	lastErrorToString = tr("No error");
@@ -844,8 +843,9 @@ printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceBegin result
 	while (isActive()) {
 		// LUP_RETURN_NAME and LUP_RETURN_ADDR flags are used to return the name and the address of the discovered device
 printf("WinBluetoothDeviceDiscoveryAgent::doWork(): lookup %p\n", hLookup);
+		DWORD bufferLength = sizeof(buffer);
 		int result = WSALookupServiceNextW(hLookup, LUP_RETURN_NAME | LUP_RETURN_ADDR, &bufferLength, pResults);
-printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceNext result: %d\n", result);
+printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceNext result: %d length: %ld\n", result, bufferLength);
 		// On error, Windows returns -1. The actual error code is fetched by WSAGetLastError.
 		if (result != SUCCESS)
 			result = WSAGetLastError();

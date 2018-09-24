@@ -244,11 +244,11 @@ void BtDeviceSelectionDialog::showEvent(QShowEvent *event)
 
 void BtDeviceSelectionDialog::on_clear_clicked()
 {
-printf("BtDeviceSelectionDialog::on_clear_clicked()\n");
+qDebug() << "BtDeviceSelectionDialog::on_clear_clicked()";
 	if (remoteDeviceDiscoveryAgent && remoteDeviceDiscoveryAgent->isActive())
 		stopScan();
 
-printf("BtDeviceSelectionDialog::on_clear_clicked() 2\n");
+qDebug() << "BtDeviceSelectionDialog::on_clear_clicked() 2";
 	ui->dialogStatus->setText(tr("Remote devices list was cleared."));
 	ui->discoveredDevicesList->clear();
 	maxPriority = 0;
@@ -718,10 +718,10 @@ void BtDeviceSelectionDialog::initializeDeviceDiscoveryAgent()
 	// On Windows, we use a global BluetoothDeviceDiscoveryAgent instance. This is needed to avoid
 	// unnecessary delays when the agent is stuck in a syscall. Moreover, as opposed to non-Windows
 	// we don't support multiple local devices anyway, so we never have to reinitialize it.
-printf("Create WinBluetoothDeviceDiscoveryAgent()\n");
+qDebug() << "Create WinBluetoothDeviceDiscoveryAgent()";
 	static WinBluetoothDeviceDiscoveryAgent agent;
 	remoteDeviceDiscoveryAgent = &agent;
-printf("Create WinBluetoothDeviceDiscoveryAgent() done\n");
+qDebug() << "Create WinBluetoothDeviceDiscoveryAgent() done";
 #else
 	// Intialize the discovery agent
 	remoteDeviceDiscoveryAgent.reset(new QBluetoothDeviceDiscoveryAgent(localDevice->address()));
@@ -753,28 +753,28 @@ WinBluetoothDeviceDiscoveryAgent::WinBluetoothDeviceDiscoveryAgent(QObject *pare
 	stopped(true),
 	quit(false)
 {
-printf("WinBluetoothDeviceDiscoveryAgent::WinBluetoothDeviceDiscoveryAgent()\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::WinBluetoothDeviceDiscoveryAgent()";
 }
 
 WinBluetoothDeviceDiscoveryAgent::~WinBluetoothDeviceDiscoveryAgent()
 {
-printf("WinBluetoothDeviceDiscoveryAgent::~WinBluetoothDeviceDiscoveryAgent()\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::~WinBluetoothDeviceDiscoveryAgent()";
 	{
 		QMutexLocker l(&lock);
 		quit = false;
 	}
-printf("WinBluetoothDeviceDiscoveryAgent::~WinBluetoothDeviceDiscoveryAgent() wake\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::~WinBluetoothDeviceDiscoveryAgent() wake";
 	cond.wakeOne();
-printf("WinBluetoothDeviceDiscoveryAgent::~WinBluetoothDeviceDiscoveryAgent() wait\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::~WinBluetoothDeviceDiscoveryAgent() wait";
 	wait();
-printf("WinBluetoothDeviceDiscoveryAgent::~WinBluetoothDeviceDiscoveryAgent() done\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::~WinBluetoothDeviceDiscoveryAgent() done";
 }
 
 bool WinBluetoothDeviceDiscoveryAgent::isActive() const
 {
-printf("WinBluetoothDeviceDiscoveryAgent::isActive()\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::isActive()";
 	QMutexLocker l(&lock);
-printf("WinBluetoothDeviceDiscoveryAgent::isActive() locked\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::isActive() locked";
 	return !stopped && !quit;
 }
 
@@ -798,10 +798,10 @@ void WinBluetoothDeviceDiscoveryAgent::reportError(QBluetoothDeviceDiscoveryAgen
 		return;
 	lastErrorToString = qt_error_string();
 	lastError = errorCode;
-printf("WinBluetoothDeviceDiscoveryAgent::reportError(): %s %d\n", qPrintable(lastErrorToString), (int)lastError);
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::reportError():" << qPrintable(lastErrorToString) << (int)lastError;
 	stopped = true;
 	l.unlock();
-printf("WinBluetoothDeviceDiscoveryAgent::reportError() done\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::reportError() done";
 	emit error(errorCode);
 }
 
@@ -815,7 +815,7 @@ void WinBluetoothDeviceDiscoveryAgent::doWork()
 	lastError = QBluetoothDeviceDiscoveryAgent::NoError;
 	lastErrorToString = tr("No error");
 
-printf("WinBluetoothDeviceDiscoveryAgent::doWork(): init\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::doWork(): init";
 	// Initialize query for device and start the lookup service
 	memset(&queryset, 0, sizeof(queryset));
 	queryset.dwSize = sizeof(queryset);
@@ -825,7 +825,7 @@ printf("WinBluetoothDeviceDiscoveryAgent::doWork(): init\n");
 	// while LUP_FLUSHCACHE flag is used to flush the device cache for all inquiries
 	// and to do a fresh lookup instead.
 	int result = WSALookupServiceBeginW(&queryset, LUP_CONTAINERS | LUP_FLUSHCACHE, &hLookup);
-printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceBegin result: %d\n", result);
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceBegin result:" << result;
 	if (result != SUCCESS) {
 		qWarning() << "Couldn't start Bluetooth lookup service:" << WSAGetLastError();
 		// Get the last error and emit a signal
@@ -842,14 +842,14 @@ printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceBegin result
 
 	while (isActive()) {
 		// LUP_RETURN_NAME and LUP_RETURN_ADDR flags are used to return the name and the address of the discovered device
-printf("WinBluetoothDeviceDiscoveryAgent::doWork(): lookup %p\n", hLookup);
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::doWork(): lookup" << hLookup;
 		DWORD bufferLength = sizeof(buffer);
 		int result = WSALookupServiceNextW(hLookup, LUP_RETURN_NAME | LUP_RETURN_ADDR, &bufferLength, pResults);
-printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceNext result: %d length: %ld\n", result, bufferLength);
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceNext result:" << result << bufferLength;
 		// On error, Windows returns -1. The actual error code is fetched by WSAGetLastError.
 		if (result != SUCCESS)
 			result = WSAGetLastError();
-printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceNext translated result: %d\n", result);
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceNext translated result:" << result;
 		if (result == WSA_E_NO_MORE || result == WSAENOMORE)
 			// No more entries -> start over
 			break;
@@ -891,7 +891,7 @@ printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceNext transla
 		// Save the name of the discovered device and truncate the address
 		QString deviceName = QString::fromWCharArray(pResults->lpszServiceInstanceName);
 		deviceAddress.truncate(BTH_ADDR_PRETTY_STRING_LEN);
-printf("WinBluetoothDeviceDiscoveryAgent::doWork(): device name: %s\n", qPrintable(deviceName));
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::doWork(): device name:" << deviceName;
 
 		// Create an object with information about the discovered device
 		QBluetoothDeviceInfo deviceInfo(QBluetoothAddress(deviceAddress), deviceName, 0);
@@ -899,15 +899,15 @@ printf("WinBluetoothDeviceDiscoveryAgent::doWork(): device name: %s\n", qPrintab
 		// Raise a signal with information about the found remote device
 		emit deviceDiscovered(deviceInfo);
 	}
-printf("WinBluetoothDeviceDiscoveryAgent::doWork(): end\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::doWork(): end";
 	WSALookupServiceEnd(hLookup);
 }
 
 void WinBluetoothDeviceDiscoveryAgent::run()
 {
-printf("WinBluetoothDeviceDiscoveryAgent::run()\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::run()";
 	for (;;) {
-printf("WinBluetoothDeviceDiscoveryAgent::run() wait\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::run() wait";
 		// Wait for either quit-signal or work-to-do
 		for (;;) {
 			QMutexLocker l(&lock);
@@ -917,34 +917,34 @@ printf("WinBluetoothDeviceDiscoveryAgent::run() wait\n");
 				break;
 			cond.wait(&lock);
 		}
-printf("WinBluetoothDeviceDiscoveryAgent::run() doWork\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::run() doWork";
 		doWork();
-printf("WinBluetoothDeviceDiscoveryAgent::run() work done\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::run() work done";
 	}
 }
 
 void WinBluetoothDeviceDiscoveryAgent::stop()
 {
-printf("WinBluetoothDeviceDiscoveryAgent::stop()\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::stop()";
 	QMutexLocker l(&lock);
 	stopped = true;
-printf("WinBluetoothDeviceDiscoveryAgent::stop() done\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::stop() done";
 }
 
 void WinBluetoothDeviceDiscoveryAgent::start()
 {
-printf("WinBluetoothDeviceDiscoveryAgent::start()\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::start()";
 	if (!isRunning())
 		QThread::start();
-printf("WinBluetoothDeviceDiscoveryAgent::start() thread running\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::start() thread running";
 	{
 		QMutexLocker l(&lock);
-printf("WinBluetoothDeviceDiscoveryAgent::start() locked\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::start() locked";
 		stopped = false;
 	}
-printf("WinBluetoothDeviceDiscoveryAgent::start() wake\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::start() wake";
 	cond.wakeOne();
-printf("WinBluetoothDeviceDiscoveryAgent::start() done\n");
+qDebug() << "WinBluetoothDeviceDiscoveryAgent::start() done";
 }
 
 #endif

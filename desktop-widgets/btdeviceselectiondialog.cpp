@@ -807,10 +807,10 @@ printf("WinBluetoothDeviceDiscoveryAgent::reportError() done\n");
 
 void WinBluetoothDeviceDiscoveryAgent::doWork()
 {
-	WSAQUERYSET queryset;
+	WSAQUERYSETW queryset;
 	HANDLE hLookup;
 	BYTE buffer[4096];
-	WSAQUERYSET *pResults = (WSAQUERYSET*)&buffer;
+	WSAQUERYSETW *pResults = (WSAQUERYSETW*)&buffer;
 	DWORD bufferLength = sizeof(buffer);
 
 	lastError = QBluetoothDeviceDiscoveryAgent::NoError;
@@ -818,14 +818,14 @@ void WinBluetoothDeviceDiscoveryAgent::doWork()
 
 printf("WinBluetoothDeviceDiscoveryAgent::doWork(): init\n");
 	// Initialize query for device and start the lookup service
-	memset(&queryset, 0, sizeof(WSAQUERYSET));
-	queryset.dwSize = sizeof(WSAQUERYSET);
+	memset(&queryset, 0, sizeof(queryset));
+	queryset.dwSize = sizeof(queryset);
 	queryset.dwNameSpace = NS_BTH;
 
 	// The LUP_CONTAINERS flag is used to signal that we are doing a device inquiry
 	// while LUP_FLUSHCACHE flag is used to flush the device cache for all inquiries
 	// and to do a fresh lookup instead.
-	int result = WSALookupServiceBegin(&queryset, LUP_CONTAINERS | LUP_FLUSHCACHE, &hLookup);
+	int result = WSALookupServiceBeginW(&queryset, LUP_CONTAINERS | LUP_FLUSHCACHE, &hLookup);
 printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceBegin result: %d\n", result);
 	if (result != SUCCESS) {
 		qWarning() << "Couldn't start Bluetooth lookup service:" << WSAGetLastError();
@@ -837,14 +837,14 @@ printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceBegin result
 	// Declare the necessary variables to collect the information
 	memset(buffer, 0, sizeof(buffer));
 
-	pResults->dwSize = sizeof(WSAQUERYSET);
+	pResults->dwSize = sizeof(WSAQUERYSETW);
 	pResults->dwNameSpace = NS_BTH;
 	pResults->lpBlob = NULL;
 
 	while (isActive()) {
 		// LUP_RETURN_NAME and LUP_RETURN_ADDR flags are used to return the name and the address of the discovered device
 printf("WinBluetoothDeviceDiscoveryAgent::doWork(): lookup %p\n", hLookup);
-		int result = WSALookupServiceNext(hLookup, LUP_RETURN_NAME | LUP_RETURN_ADDR, &bufferLength, pResults);
+		int result = WSALookupServiceNextW(hLookup, LUP_RETURN_NAME | LUP_RETURN_ADDR, &bufferLength, pResults);
 printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceNext result: %d\n", result);
 		// On error, Windows returns -1. The actual error code is fetched by WSAGetLastError.
 		if (result != SUCCESS)
@@ -865,7 +865,7 @@ printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceNext transla
 		QString deviceAddress(BTH_ADDR_BUF_LEN, Qt::Uninitialized);
 		DWORD addressSize = BTH_ADDR_BUF_LEN;
 
-		// Collect the address of the device from the WSAQUERYSET
+		// Collect the address of the device from the WSAQUERYSETW
 		SOCKADDR_BTH *socketBthAddress = (SOCKADDR_BTH *) pResults->lpcsaBuffer->RemoteAddr.lpSockaddr;
 
 		// Convert the BTH_ADDR to string
@@ -889,8 +889,9 @@ printf("WinBluetoothDeviceDiscoveryAgent::doWork(): WSALookupServiceNext transla
 		deviceAddress.remove('(');
 
 		// Save the name of the discovered device and truncate the address
-		QString deviceName = QString(pResults->lpszServiceInstanceName);
+		QString deviceName = QString::fromWCharArray(pResults->lpszServiceInstanceName);
 		deviceAddress.truncate(BTH_ADDR_PRETTY_STRING_LEN);
+printf("WinBluetoothDeviceDiscoveryAgent::doWork(): device name: %s\n", qPrintable(deviceName));
 
 		// Create an object with information about the discovered device
 		QBluetoothDeviceInfo deviceInfo(QBluetoothAddress(deviceAddress), deviceName, 0);

@@ -92,10 +92,7 @@ static timestamp_t extract_timestamp(const xmlNode *node)
 
 		// Parse content, if not blank node. Content can only be at the second level,
 		// since it is always contained in a tag.
-		// TODO: We have to cast node to pointer to non-const, since we're supporting
-		// old libxml2 versions, where xmlIsBlankNode takes such a pointer. Remove
-		// in due course.
-		if (!xmlIsBlankNode((xmlNode *)node) && stack_depth >= 2) {
+		if (!xmlIsBlankNode(node) && stack_depth >= 2) {
 			const xmlNode *parent = stack[stack_depth - 2];
 			// If this is a text node and the parent node is exif:DateTimeOriginal, try to parse as date
 			if (!node->ns && parent->ns &&

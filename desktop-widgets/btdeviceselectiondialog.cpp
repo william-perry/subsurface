@@ -730,6 +730,15 @@ void WinBluetoothDeviceDiscoveryAgent::reportError(QBluetoothDeviceDiscoveryAgen
 
 void WinBluetoothDeviceDiscoveryAgent::doWork()
 {
+	// We do two lookups: first query the system cache then, if still active,
+	// do a real on-air device discovery.
+	doLookup(true);
+	if (isActive())
+		doLookup(false);
+}
+
+void WinBluetoothDeviceDiscoveryAgent::doLookup(bool querySystemCache)
+{
 	WSAQUERYSETW queryset;
 	HANDLE hLookup;
 	BYTE buffer[4096];
@@ -746,7 +755,11 @@ void WinBluetoothDeviceDiscoveryAgent::doWork()
 	// The LUP_CONTAINERS flag is used to signal that we are doing a device inquiry
 	// while LUP_FLUSHCACHE flag is used to flush the device cache for all inquiries
 	// and to do a fresh lookup instead.
-	int result = WSALookupServiceBeginW(&queryset, LUP_CONTAINERS | LUP_FLUSHCACHE, &hLookup);
+	DWORD flags = LUP_CONTAINERS;
+	if (!querySystemCache)
+		flags |= LUP_FLUSHCACHE;
+
+	int result = WSALookupServiceBeginW(&queryset, flags, &hLookup);
 	if (result != SUCCESS) {
 		result = WSAGetLastError();
 		qWarning() << "Couldn't start Bluetooth lookup service:" << result;

@@ -48,6 +48,7 @@ public:
 
 private:
 	void doWork();
+	void doLookup(bool querySystemCache);
 
 	mutable QMutex lock;
 	mutable QWaitCondition cond;

@@ -18,7 +18,10 @@
 
 void saveBtDeviceInfo(const QString &devaddr, QBluetoothDeviceInfo deviceInfo);
 bool isBluetoothAddress(const QString &address);
+QString extractBluetoothAddress(const QString &address);
+QString extractBluetoothNameAddress(const QString &address, QString &name);
 QBluetoothDeviceInfo getBtDeviceInfo(const QString &devaddr);
+
 dc_descriptor_t *getDeviceType(QString btName);
 
 class BTDiscovery : public QObject {

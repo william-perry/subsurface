@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 #include "testhelper.h"
-#include "core/btdiscovery.h"
 
+bool isBluetoothAddress(const QString &);
+QString extractBluetoothNameAddress(const QString &, QString &);
 void TestHelper::initTestCase()
 {
 	/* we need to manually tell that the resource exists, because we are using it as library. */

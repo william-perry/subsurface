@@ -34,7 +34,7 @@ cd ${TRAVIS_BUILD_DIR}/..
 mkdir -p win32
 
 # start the container and keep it running
-docker run -v $PWD/win32:/win/win32 -v $PWD/subsurface:/win/subsurface --name=builder -w /win -d dirkhh/mxe-build-container:0.6 /bin/sleep 60m
+docker run -v $PWD/win32:/win/win32 -v $PWD/subsurface:/win/subsurface --name=builder -w /win -d dirkhh/mxe-build-container:0.8 /bin/sleep 60m
 
 # for some reason this package was installed but still isn't there?
 # hmmmm. The container doesn't seem to have libtool installed
@@ -50,12 +50,3 @@ docker exec -t builder bash subsurface/scripts/get-dep-lib.sh single . grantlee
 
 # smtk2ssrf build
 docker exec -t builder bash subsurface/scripts/get-dep-lib.sh single . mdbtools
-
-# get prebuilt static mxe libraries for glib.
-# do not overwrite upstream prebuilt mxe binaries if there is any coincidence.
-echo -n "Downloading prebuilt static mxe ... "
-docker exec -t builder wget -q https://www.dropbox.com/s/2ahfkyi6rhbihtn/mxe-static-minimal-a08b3225.tar.xz
-echo -n "Untarring ... "
-docker exec -t builder tar -C /win/mxe -xJf mxe-static-minimal-a08b3225.tar.xz --skip-old-files
-echo "Done."
-docker exec -t builder ln -vs /win/mxe /usr/src/mxe

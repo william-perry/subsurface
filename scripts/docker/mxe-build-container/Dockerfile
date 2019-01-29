@@ -48,4 +48,5 @@ RUN apt-get update  &&  apt-get upgrade -y && \
     PATH=/win/mxe/usr/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin /win/mxe/usr/i686-w64-mingw32.shared/qt5/bin/qmake qtconnectivity.pro ; \
     PATH=/win/mxe/usr/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin make -j 6 ; \
     PATH=/win/mxe/usr/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin make install ; \
+    make MXE_TARGETS=i686-w64-mingw32.static LOCAL_PKG_LIST=glib -j 6 2>&1 |tee build.log ; \
     rm -rf /win/mxe/pkg

@@ -48,28 +48,4 @@ RUN apt-get update  &&  apt-get upgrade -y && \
     PATH=/win/mxe/usr/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin /win/mxe/usr/i686-w64-mingw32.shared/qt5/bin/qmake qtconnectivity.pro ; \
     PATH=/win/mxe/usr/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin make -j 6 ; \
     PATH=/win/mxe/usr/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin make install ; \
-    rm -rf /win/mxe/pkg ; \
-    apt-get purge -y --auto-remove \
-    autopoint \
-    bison \
-    flex \
-    g++ \
-    g++-multilib \
-    gettext \
-    gperf \
-    intltool \
-    libc6-dev-i386 \
-    libgdk-pixbuf2.0-dev \
-    libltdl-dev \
-    libssl-dev \
-    libtool-bin \
-    libxml-parser-perl \
-    openssl \
-    p7zip-full \
-    perl \
-    python \
-    ruby \
-    unzip \
-    xz-utils \
-    lzip \
-    scons
+    rm -rf /win/mxe/pkg

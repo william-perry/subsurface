@@ -147,7 +147,7 @@ static dc_status_t dt_libdc_buffer(unsigned char *ptr, int prf_length, int dc_mo
  * Parses a mem buffer extracting its data and filling a subsurface's dive structure.
  * Returns a pointer to last position in buffer, or NULL on failure.
  */
-static unsigned char *dt_dive_parser(unsigned char *runner, struct dive *dt_dive)
+static unsigned char *dt_dive_parser(unsigned char *runner, struct dive *dt_dive, struct dive_site_table *sites)
 {
 	int  rc, profile_length, libdc_model;
 	char *tmp_notes_str = NULL;
@@ -202,10 +202,10 @@ static unsigned char *dt_dive_parser(unsigned char *runner, struct dive *dt_dive
 	 * Locality and Dive points.
 	 */
 	snprintf(buffer, sizeof(buffer), "%s, %s", locality, dive_point);
-	ds = get_dive_site_by_name(buffer, &dive_site_table);
+	ds = get_dive_site_by_name(buffer, sites);
 	dt_dive->dive_site = ds;
 	if (!dt_dive->dive_site)
-		dt_dive->dive_site = create_dive_site(buffer, dt_dive->when, &dive_site_table);
+		dt_dive->dive_site = create_dive_site(buffer, dt_dive->when, sites);
 	free(locality);
 	locality = NULL;
 	free(dive_point);
@@ -577,7 +577,7 @@ bail:
  * Main function call from file.c memblock is allocated (and freed) there.
  * If parsing is aborted due to errors, stores correctly parsed dives.
  */
-int datatrak_import(struct memblock *mem, struct dive_table *table, struct trip_table *trips)
+int datatrak_import(struct memblock *mem, struct dive_table *table, struct trip_table *trips, struct dive_site_table *sites)
 {
 	UNUSED(trips);
 	unsigned char *runner;
@@ -599,7 +599,7 @@ int datatrak_import(struct memblock *mem, struct dive_table *table, struct trip_
 	while ((i < numdives) && ((long) runner < maxbuf)) {
 		struct dive *ptdive = alloc_dive();
 
-		runner = dt_dive_parser(runner, ptdive);
+		runner = dt_dive_parser(runner, ptdive, sites);
 		if (runner == NULL) {
 			report_error(translate("gettextFromC", "Error: no dive"));
 			free(ptdive);

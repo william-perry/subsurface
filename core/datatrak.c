@@ -14,6 +14,7 @@
 #include "units.h"
 #include "device.h"
 #include "file.h"
+#include "divesite.h"
 #include "ssrf.h"
 
 unsigned char lector_bytes[2], lector_word[4], tmp_1byte, *byte;

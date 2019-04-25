@@ -836,6 +836,11 @@ void MainTab::on_location_diveSiteSelected()
 		Command::editDiveSite(newDs, false);
 }
 
+void MainTab::on_locationPopupButton_clicked()
+{
+	ui.location->showAllSites();
+}
+
 void MainTab::on_diveTripLocation_editingFinished()
 {
 	if (!currentTrip)
